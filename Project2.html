@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        textarea {
+            max-width: 400px;
+            min-width: 400px;
+            max-height: 100px;
+            min-height: 100px;
+        }
+    </style>
+    <script>
+        function checkForm() {
+            var allValid = true;
+            var errorMessage = "";
+
+            // Username must not have a capital letter
+            var userText = username.value;
+            var errorCap = false;
+            for (var i = 0; i < userText.length; i++) {
+                var charCode = userText.charCodeAt(i);
+                if (charCode < 'a'.charCodeAt(0) || charCode > 'z'.charCodeAt(0)) {
+                    errorCap = true;
+                    break;
+                }
+            }
+            if (errorCap) {
+                errorMessage += "Username Error: Capital Letter<br>";
+                allValid = false;
+             }
+
+            // Password must have 1 uppercase, 1 lowercase, and 1 number
+            var passText = password.value;
+            var hasUpperCase = false;
+            var hasLowerCase = false;
+            var hasNumber = false;
+
+            for (var i = 0; i < passText.length; i++) {
+                var charCode = passText.charCodeAt(i);
+                if (charCode >= 'A'.charCodeAt(0) && charCode <= 'Z'.charCodeAt(0)) {
+                    hasUpperCase = true;
+                } else if (charCode >= 'a'.charCodeAt(0) && charCode <= 'z'.charCodeAt(0)) {
+                    hasLowerCase = true;
+                } else if (charCode >= '0'.charCodeAt(0) && charCode <= '9'.charCodeAt(0)) {
+                    hasNumber = true;
+                }
+            }
+
+            if (!hasUpperCase || !hasLowerCase || !hasNumber) {
+                errorMessage += "Password Error: Password must contain at least one uppercase letter, one lowercase letter, and one number<br>";
+                allValid = false;
+            }
+
+            // Student ID must be 9 digits/ no letters
+            var stIDNumText = studIDNum.value;
+            var hasNumbers = true;
+
+            if (stIDNumText.length !== 9) {
+                hasNumbers = false;
+            } else {
+                for (var i = 0; i < stIDNumText.length; i++) {
+                    var charCode = stIDNumText.charCodeAt(i);
+                    if (charCode < '0'.charCodeAt(0) || charCode > '9'.charCodeAt(0)) {
+                        hasNumbers = false;
+                        break;
+                    }
+                }
+            }
+
+            if (!hasNumbers) {
+                errorMessage += "Student ID Error: Must contain 9 numbers<br>";
+                allValid = false;
+            }
+            // Semester and year checking that it can't be in the future
+            var currentYear = new Date().getFullYear();
+            var currentMonth = new Date().getMonth() + 1;
+            var semText = ["Fall", "Spring", "Summer"];
+            var enteredSemester = srtSem.value;
+            var enteredYear = parseInt(year.value);
+
+            var isValidSemester = semText.includes(enteredSemester);
+            var isValidYear = !isNaN(enteredYear) && enteredYear <= currentYear && enteredYear.toString().length === 4;
+
+            if (isValidSemester && isValidYear) {
+                if (enteredYear === currentYear) {
+                    if ((enteredSemester === "Fall" && currentMonth >= 9) ||
+                        (enteredSemester === "Spring" && currentMonth >= 1 && currentMonth <= 5) ||
+                        (enteredSemester === "Summer" && currentMonth >= 6 && currentMonth <= 8)) {
+                        
+                    } else {
+                        errorMessage += "Semester Error: Semester cannot be in the future<br>";
+                        allValid = false;
+                    }
+                }
+            } else {
+                errorMessage += "Semester/year Error: Invalid semester or year<br>";
+                allValid = false;
+            }
+
+            // Form submission result
+            if (allValid) {
+                checkDiv.innerHTML = "Form Submitted Successfully!";
+                checkDiv.style.color = "green";
+                document.body.style.backgroundColor = "white";
+            } else {
+                checkDiv.innerHTML = errorMessage;
+                checkDiv.style.color = "red";
+                document.body.style.backgroundColor = "lightpink";
+            }
+        }
+
+        function keyPressed(event) {
+            var currText = textArea.value;
+            var wordsArray = currText.split(" ").filter(Boolean);
+            var wordCount = wordsArray.length;
+            var wordLimit = 25;
+            var wordsRemaining = wordLimit - wordCount;
+            numWordsSpan.innerHTML = wordsRemaining;
+
+            if (wordCount >= wordLimit) {
+                textArea.disabled = true;
+                numWordsSpan.innerHTML = "0";
+            } else {
+                textArea.disabled = false;
+            }
+        }
+
+        function init() {
+            var button = document.getElementById("button");
+            button.addEventListener("click", checkForm);
+
+            username = document.getElementById("username");
+            password = document.getElementById("password");
+            studIDNum = document.getElementById("studIDNum");
+            srtSem = document.getElementById("srtSem");
+            year = document.getElementById("year");
+            textArea = document.getElementById("textArea");
+            textArea.addEventListener("input", keyPressed);
+            numWordsSpan = document.getElementById("numWordsSpan");
+
+            checkDiv = document.getElementById("checkDiv");
+        }
+
+        window.addEventListener("load", init);
+    </script>
+</head>
+<body>
+    <form id="theForm">
+        <label for="username">Username:</label>
+        <input type="text" id="username" name="username"><br><br>
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password"><br><br>
+        <label for="StudIDNum">Student ID Number:</label>
+        <input type="text" id="studIDNum" name="StudIDNum" maxlength="9"><br><br>
+        <label for="srtSem">Start Semester:</label><label for="year">/Year:</label>
+        <input type="text" id="srtSem" name="srtSem" placeholder="Ex: Fall"><input type="text" id="year" name="year" placeholder="Ex: 2024" maxlength="4"><br><br>
+
+        <label for="Message">Message:<br>
+            <textarea id="textArea"></textarea>
+        </label>
+        <p>Words remaining: <span id="numWordsSpan">25</span></p>
+        <input type="button" id="button" value="Submit">
+    </form>
+    
+    <div id="checkDiv"></div>
+</body>
+</html>
